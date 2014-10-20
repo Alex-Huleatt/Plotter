@@ -216,12 +216,18 @@ public class Panel extends javax.swing.JPanel {
      * Returns the minimum x value that this will display
      *
      */
-    private int minX() {
-        return (int) data.get(0)[0].x;
+    private double minX() {
+        double min = Double.POSITIVE_INFINITY;
+        for (Point[] a : data) {
+            for (Point p : a) {
+                min = Math.min(p.x, min);
+            }
+        }
+        return min;
     }
 
     /**
-     * 
+     *
      * @return minimum y-value this panel will display
      */
     private double minY() {
@@ -235,20 +241,20 @@ public class Panel extends javax.swing.JPanel {
     }
 
     /**
-     * 
+     *
      * @return normalization value for x
      */
     private double xMul() {
-        return ((double) getWidth() / maxX());
+        return ((double) getWidth() / (maxX() - minX()));
     }
 
     /**
-     * 
+     *
      * @return normalization factor for y
      */
     private double yMul() {
         return ((double) maxY() - minY()) / (double) getHeight();
-    } 
+    }
 
     @Override
     public void paint(Graphics g) {
@@ -338,7 +344,7 @@ public class Panel extends javax.swing.JPanel {
     }
 
     public Point drawPoint(Point p) {
-        int x = (int) (p.x * xMul()) - RECT_SIZE / 2;
+        int x = (int) ((p.x * xMul()) + minX() * xMul()) - RECT_SIZE / 2;
         int y = (int) ((getHeight() + minY() / yMul()) - (p.y / yMul())) - RECT_SIZE / 2;
         return new Point(x, y);
     }
