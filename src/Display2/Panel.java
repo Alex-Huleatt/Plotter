@@ -76,17 +76,19 @@ public class Panel extends javax.swing.JPanel {
                 double minDis = 0;
                 boolean okay = false;
                 for (int i = 0; i < data.size(); i++) {
-                    Point[] arr = data.get(i);
-                    for (int j = 0; j < arr.length; j++) {
-                        Point p2 = arr[j];
-                        Point temp_draw = drawPoint(p2);
-                        double dis = euclid(p, temp_draw);
-                        if (dis < 10 && (minDraw == null || dis < minDis)) {
-                            minDraw = temp_draw;
-                            minPoint = p2;
-                            minDis = dis;
-                            minName = data_names.get(i);
-                            okay = true;
+                    if (display_data.get(i)) {
+                        Point[] arr = data.get(i);
+                        for (int j = 0; j < arr.length; j++) {
+                            Point p2 = arr[j];
+                            Point temp_draw = drawPoint(p2);
+                            double dis = euclid(p, temp_draw);
+                            if (dis < 10 && (minDraw == null || dis < minDis)) {
+                                minDraw = temp_draw;
+                                minPoint = p2;
+                                minDis = dis;
+                                minName = data_names.get(i);
+                                okay = true;
+                            }
                         }
                     }
                 }
@@ -135,10 +137,13 @@ public class Panel extends javax.swing.JPanel {
     private double maxX() {
         double max = 0;
         ArrayList<Double> xs = new ArrayList<>();
-        for (Point[] a : data) {
-            for (Point p : a) {
-                if (!xs.contains(p.x)) {
-                    xs.add(p.x);
+        for (int i = 0; i < data.size(); i++) {
+            if (display_data.get(i)) {
+                Point[] a = data.get(i);
+                for (Point p : a) {
+                    if (!xs.contains(p.x)) {
+                        xs.add(p.x);
+                    }
                 }
             }
         }
@@ -158,10 +163,13 @@ public class Panel extends javax.swing.JPanel {
     private double maxY() {
         double max = 0;
         double maxX = maxX();
-        for (Point[] a : data) {
-            for (Point p : a) {
-                if (p.x <= maxX) {
-                    max = Math.max(p.y, max);
+        for (int i = 0; i < data.size(); i++) {
+            if (display_data.get(i)) {
+                Point[] a = data.get(i);
+                for (Point p : a) {
+                    if (p.x <= maxX) {
+                        max = Math.max(p.y, max);
+                    }
                 }
             }
         }
