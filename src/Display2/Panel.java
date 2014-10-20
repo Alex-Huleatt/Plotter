@@ -28,23 +28,22 @@ import operating.systems.Point;
  */
 public class Panel extends javax.swing.JPanel {
 
-    private ArrayList<Point[]> data;
-    public static int RECT_SIZE = 4;
-    public static Color[] colors = new Color[]{Color.MAGENTA, Color.GREEN, Color.ORANGE, Color.RED, Color.PINK, Color.CYAN, Color.BLUE};
-    private Point draw_info;
-    private String draw_name;
-    private boolean display_legend;
+    private ArrayList<Point[]> data; //data files
+    public static int RECT_SIZE = 4; //size of point
+    public static Color[] colors = new Color[]{Color.MAGENTA, Color.GREEN, Color.ORANGE, Color.RED, Color.PINK, Color.CYAN, Color.BLUE}; //color constants
+    private Point draw_info; //Point the mouse is hovering over
+    private boolean display_legend; //boolean to determine if legend should be displayed
 
-    private int scroll_level;
-    private ArrayList<String> data_names;
-    private ArrayList<Boolean> display_labels;
-    private ArrayList<Boolean> display_data;
+    private int scroll_level; //integer representing the zoom level
+    private ArrayList<String> data_names; //Names of all data files
+    private ArrayList<Boolean> display_labels; //Boolean representing if the point info for this data should be displayed
+    private ArrayList<Boolean> display_data; //Boolean determining if this data file should be displayed
 
     /**
      * Creates new form panel
      */
     public Panel() {
-        initComponents();
+        initComponents(); //auto-generated, initialize stuff
         data = new ArrayList<>();
         data_names = new ArrayList<>();
         scroll_level = 0;
@@ -54,12 +53,13 @@ public class Panel extends javax.swing.JPanel {
 
             @Override
             public void mouseWheelMoved(MouseWheelEvent e) {
-                scroll_level += e.getWheelRotation();
+                scroll_level += e.getWheelRotation(); //modify zoom level on scroll
                 repaint();
             }
 
         });
 
+        //Mouse listener allows the user to get information on a point by hovering over it
         addMouseMotionListener(new MouseMotionListener() {
 
             @Override
@@ -69,11 +69,11 @@ public class Panel extends javax.swing.JPanel {
 
             @Override
             public void mouseMoved(MouseEvent e) {
-                Point p = new Point(e.getX(), e.getY());
-                Point minDraw = null;
-                Point minPoint = null;
+                Point p = new Point(e.getX(), e.getY()); //Point from the mouse
+                Point minDraw = null; //normalize point closest to normalize mouse point
+                Point minPoint = null; //Point closest to mouse
                 String minName = "";
-                double minDis = 0;
+                double minDis = 0; //minimum distance found between point and mouse
                 boolean okay = false;
                 for (int i = 0; i < data.size(); i++) {
                     if (display_data.get(i)) {
@@ -92,9 +92,8 @@ public class Panel extends javax.swing.JPanel {
                         }
                     }
                 }
-                if (okay) {
+                if (okay) { //only display if the closest point is under a threshold
                     draw_info = minPoint;
-                    draw_name = minName;
                 } else {
                     draw_info = null;
                 }
@@ -104,28 +103,55 @@ public class Panel extends javax.swing.JPanel {
         });
     }
 
+    /**
+     * Toggle whether the legend should be displayed or not.
+     */
     public void toggle_legend() {
         display_legend = !display_legend;
     }
 
+    /**
+     * Toggle whether point information for the inputted data number should be
+     * displayed
+     *
+     * @param a
+     */
     public void toggle_label(int a) {
         if (a < display_labels.size()) {
             display_labels.set(a, !display_labels.get(a));
         }
     }
 
+    /**
+     * Toggle whether the inputted data should be displayed or not
+     *
+     * @param a
+     */
     public void toggle_data(int a) {
         if (a < display_data.size()) {
             display_data.set(a, !display_data.get(a));
         }
     }
 
+    /**
+     *
+     * @param p1
+     * @param p2
+     * @return Euclidean distance between p1 and p2
+     */
     private double euclid(Point p1, Point p2) {
         int xDif = (int) (p2.x - p1.x);
         int yDif = (int) (p2.y - p1.y);
         return Math.sqrt(xDif * xDif + yDif * yDif);
     }
 
+    /**
+     * Gives a data file to the panel.
+     *
+     * @param points
+     * @param set_name
+     * @return
+     */
     public String gibPoints(Point[] points, String set_name) {
         data.add(points);
         display_labels.add(false);
@@ -134,6 +160,11 @@ public class Panel extends javax.swing.JPanel {
         return colors[data.size()].toString();
     }
 
+    /**
+     * Returns the maximum x value that this panel will display
+     *
+     * @return
+     */
     private double maxX() {
         double max = 0;
         ArrayList<Double> xs = new ArrayList<>();
@@ -160,6 +191,11 @@ public class Panel extends javax.swing.JPanel {
         return xs.get(xs.size() - (level));
     }
 
+    /**
+     * Returns the maximum y-value that this panel will display
+     *
+     * @return
+     */
     private double maxY() {
         double max = 0;
         double maxX = maxX();
@@ -176,10 +212,18 @@ public class Panel extends javax.swing.JPanel {
         return max;
     }
 
+    /**
+     * Returns the minimum x value that this will display
+     *
+     */
     private int minX() {
         return (int) data.get(0)[0].x;
     }
 
+    /**
+     * 
+     * @return minimum y-value this panel will display
+     */
     private double minY() {
         double min = Double.POSITIVE_INFINITY;
         for (Point[] a : data) {
@@ -190,17 +234,21 @@ public class Panel extends javax.swing.JPanel {
         return min;
     }
 
+    /**
+     * 
+     * @return normalization value for x
+     */
     private double xMul() {
         return ((double) getWidth() / maxX());
     }
 
+    /**
+     * 
+     * @return normalization factor for y
+     */
     private double yMul() {
         return ((double) maxY() - minY()) / (double) getHeight();
-    }
-
-    private int diff() {
-        return 1;
-    }
+    } 
 
     @Override
     public void paint(Graphics g) {
